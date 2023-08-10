@@ -1,0 +1,6 @@
+discord.py
+transformers
+torch
+faiss-cpu
+numpy
+sqlite3
