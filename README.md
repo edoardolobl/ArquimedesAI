@@ -1,8 +1,9 @@
 
 # ArquimedesAI: An Advanced Chatbot Solution
 
-![arq_git_profile](https://github.com/edoardolobl/ArquimedesAI/assets/12720007/7591742c-2c55-4a31-937e-413ccb243742)
-
+<p align="center">
+  <img src="assets/arquimedesai.jpg" alt="ArquimedesAI Logo" title="ArquimedesAI" width="35%" height="35%">
+</p>
 
 Welcome to ArquimedesAI V0.1 (alpha)! This project embodies a comprehensive chatbot solution, integrated with Discord, leveraging the strengths of BERT embeddings tailored for Portuguese. Integrated seamlessly with Discord, the bot delivers responses founded on a meticulously curated training dataset.
 
