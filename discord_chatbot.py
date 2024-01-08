@@ -50,12 +50,12 @@ class DiscordChatbot:
         processing_message = await message.channel.send("I'm working on your answer, please wait a moment...")
 
         # Generate the response
-        response = self.generate_response(message.content)
+        response = await self.generate_response(message.content)
 
         # Edit the initial message with the actual response
         await processing_message.edit(content=response)
 
-    def generate_response(self, message_content):
+    async def generate_response(self, message_content):
         """
         Generate a response using the retrieval chain.
 
@@ -63,7 +63,7 @@ class DiscordChatbot:
         :return: Response string.
         """
         input_data = {"input": message_content}
-        response = self.retrieval_chain.invoke(input_data)
+        response = await self.retrieval_chain.ainvoke(input_data)
         return response["answer"]
 
     def run(self):
