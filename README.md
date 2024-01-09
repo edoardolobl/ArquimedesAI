@@ -7,6 +7,18 @@
 
 Welcome to ArquimedesAI V0.2! This version marks a significant upgrade, transforming ArquimedesAI into a state-of-the-art chatbot powered by a Large Language Model (LLM) and integrated with Discord. Leveraging advanced NLP technologies, ArquimedesAI offers rich, context-aware interactions and can be run locally on a user's PC.
 
+
+> ## :warning: Disclaimer
+>
+> **Development Status:** Please note that ArquimedesAI is currently in active development. As such, the software is in a continuous state of evolution. Users should be aware that frequent updates and significant changes are expected as we work towards refining features and enhancing performance.
+>
+> **Use with Caution:** Given its developmental nature, we advise users to exercise caution when integrating ArquimedesAI into critical applications. While we strive for reliability, the current version may still contain bugs or inconsistencies that could affect its operation.
+>
+> **Feedback and Contributions:** We welcome feedback and contributions from the community. Your input is invaluable in helping us shape the future of ArquimedesAI. If you encounter any issues or have suggestions for improvements, please feel free to open an issue or submit a pull request.
+>
+> Thank you for your understanding and support as we continue to develop ArquimedesAI into a robust and reliable tool.
+
+
 ## Features
 - **LangChain Framework Integration**: Incorporates the powerful LangChain framework for sophisticated language understanding and generation.
 - **RAG-Ready**: Utilizes Retrieval Augmented Generation (RAG) for enhanced response accuracy and relevance.
