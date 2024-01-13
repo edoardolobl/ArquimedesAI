@@ -27,6 +27,32 @@ Welcome to ArquimedesAI V0.2! This version marks a significant upgrade, transfor
 - **Modular Design and Scalable Architecture**: Structured for easy maintenance and scalability, facilitating future enhancements.
 - **Local Run Capability**: Designed to run locally on a user's PC, ensuring privacy and ease of access.
 
+
+## Changelog
+
+### [0.2.0.1] - 2024-01-14
+#### Changed
+- Code refactoring for better performance and maintainability.
+- Added Contextual Compression Retriever: ColBERT (v2) for improved document retrieval.
+- Integration of Sentence Transformers token splitter for enhanced language processing.
+- Implementation of LangChain Expression Language (LCEL) for advanced query handling.
+
+### [0.2.0] - 2024-01-07
+#### Added
+- Complete code overhaul for enhanced functionality and efficiency.
+- Replaced Haystack with Langchain Framework for sophisticated language understanding and generation.
+- Implemented RAG (Retrieval Augmented Generation) to chat with documents.
+- Integration of Sentence Transformers for efficient text embedding.
+- Added FAISS vector database for storing embedding vectors.
+- Implementation of Mistral 7b Large Language Model for generating nuanced responses.
+
+### [0.1.0] - 2023-08-11
+#### Added
+- Initial implementation of a Q&A system using Haystack framework.
+- Q&A query-answer pair retrieval using BERT (NLP) and SQLite database.
+- Basic Discord interface for user interactions.
+
+
 ## Getting Started
 
 ### Prerequisites
