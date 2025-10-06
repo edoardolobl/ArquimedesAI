@@ -1,0 +1,69 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Environment
+.env
+.env.local
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Project-specific
+data/
+storage/
+embeddings_cache/
+
+# Development Documentation
+ArquimedesAI_Spec_Full_v1.1.md
+MIGRATION.md
+REFACTORING_SUMMARY.md
+DOCLING_UPGRADE_v1.3.md
+TESTING_v1.2.md
+*.reference
+*.backup
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+test_*.py
+verify_*.py
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
