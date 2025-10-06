@@ -5,7 +5,13 @@
 </p>
 
 <p align="center">
-  <strong>100% Open-Source, Self-Hosted RAG Chatbot</strong><br>
+  <st# Start Ollama server (separate terminal)
+ollama serve
+
+# Pull the Gemma3 model (~3GB)
+ollama pull gemma3:latest
+
+# Clone and setup>100% Open-Source, Self-Hosted RAG Chatbot</strong><br>
   <em>Runs locally on modest hardware (8-16GB RAM)</em>
 </p>
 
@@ -62,7 +68,7 @@ ArquimedesAI is a production-ready **Retrieval Augmented Generation (RAG)** chat
 ```
 User Documents → Docling Parser → HybridChunker → BGE-M3 Embeddings → Qdrant (HNSW)
                                                                               ↓
-User Query → Hybrid Retrieval → [BM25 40% + Dense 60%] → Reranker (optional) → Gemma2 LLM → Answer
+User Query → Hybrid Retrieval → [BM25 40% + Dense 60%] → Reranker (optional) → Gemma3 LLM → Answer
 ```
 
 ### Retrieval Pipeline
@@ -76,7 +82,13 @@ User Query → Hybrid Retrieval → [BM25 40% + Dense 60%] → Reranker (optiona
 - Model: `bge-reranker-v2-m3` (multilingual)
 - Improves relevance significantly (~100-300ms latency)
 
-**Generation**: Gemma2 1B LLM generates grounded answers
+- **Fetch 50 candidates** (broad net for recall)
+- **Rerank with cross-encoder** (precision filtering)
+- **Return top 3** (highly relevant results)
+
+**Generation**: Gemma3 4B LLM generates grounded answers
+
+---
 - Explicit citations from retrieved context
 - Multiple prompt modes: grounded, concise, critic, explain
 
@@ -132,7 +144,7 @@ cd ArquimedesAI
 pip install -r requirements.txt
 
 # 3. Pull Ollama model
-ollama pull gemma2:1b
+ollama pull gemma3:latest
 
 # 4. Configure environment
 cp .env.example .env
@@ -176,10 +188,10 @@ ArquimedesAI uses a `.env` file for configuration. Copy `.env.example` to `.env`
 #### Essential Settings
 
 ```bash
-# LLM Configuration
-ARQ_OLLAMA_MODEL=gemma2:1b          # Ollama model (try: llama3.1, mistral, etc.)
+# Ollama LLM
 ARQ_OLLAMA_BASE=http://localhost:11434
-ARQ_OLLAMA_TEMPERATURE=0.3          # Lower = more deterministic
+ARQ_OLLAMA_MODEL=gemma3:latest      # Ollama model (try: llama3.1, mistral, etc.)
+ARQ_OLLAMA_TEMPERATURE=0.3
 
 # Embeddings
 ARQ_EMBED_MODEL=BAAI/bge-m3         # Multilingual embeddings (1024 dim)
@@ -251,12 +263,13 @@ ARQ_RERANK_ENABLED=true
 You can change the LLM model by editing `ARQ_OLLAMA_MODEL`:
 
 ```bash
-ARQ_OLLAMA_MODEL=gemma2:1b     # Fast, 1B parameters (default)
-ARQ_OLLAMA_MODEL=llama3.1:8b   # Slower, better quality
-ARQ_OLLAMA_MODEL=mistral:7b    # Alternative option
+ARQ_OLLAMA_MODEL=gemma3:latest  # Default, 4B parameters (best balance)
+ARQ_OLLAMA_MODEL=gemma3:9b      # Higher quality, slower
+ARQ_OLLAMA_MODEL=llama3.1:8b    # Alternative high-quality option
+ARQ_OLLAMA_MODEL=mistral:7b     # Faster alternative
 ```
 
-First pull the model: `ollama pull llama3.1:8b`
+First pull the model: `ollama pull gemma3:9b`
 
 #### Retrieval Tuning
 
@@ -344,8 +357,8 @@ python cli.py chat --mode explain
 - **Grounded Answers**: Explicit citations from source documents
 - **Multi-Mode Prompts**: 4 modes (grounded, concise, critic, explain)
 - **Hallucination Prevention**: Strong prompt engineering
-- **Local LLMs**: Gemma2 1B via Ollama (fast, efficient)
-- **Flexible Models**: Easy to swap LLMs (gemma2, llama3.1, mistral)
+- **Local LLMs**: Gemma3 4B via Ollama (high quality, efficient)
+- **Flexible Models**: Easy to swap LLMs (gemma3, llama3.1, mistral)
 
 ### Interfaces
 - **CLI Chat**: Interactive testing with mode selection
@@ -382,7 +395,7 @@ python cli.py chat --mode explain
 
 ### v1.0.0 - Modern Foundation
 - 🗂️ Qdrant vector store (replaces FAISS)
-- 🤖 Gemma2 1B LLM (replaces Mistral 7B)
+- 🤖 Gemma3 4B LLM (upgraded from Mistral 7B)
 - 🌍 BGE-M3 multilingual embeddings
 - ⚡ LangChain 0.3+ with LCEL
 - 🎯 Modular architecture

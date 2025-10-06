@@ -38,10 +38,10 @@ pip install -r requirements.txt
 
 ### 3. Pull Ollama Model
 ```bash
-ollama pull gemma2:1b
+ollama pull gemma3:latest
 ```
-- [ ] Model downloaded (~700MB)
-- [ ] Test: `ollama list` shows gemma2:1b
+- [ ] Model downloaded (~3GB)
+- [ ] Test: `ollama list` shows gemma3:latest
 
 ### 4. Configure Environment
 ```bash

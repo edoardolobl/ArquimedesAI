@@ -4,11 +4,13 @@ ArquimedesAI CLI - Command-line interface for indexing and running the bot.
 Provides commands for:
 - index: Build/update vector index from documents
 - discord: Start Discord bot
+- chat: Interactive chat with conversational memory (v1.4)
 - status: Show system status
 """
 
 import logging
 from pathlib import Path
+import uuid
 
 import typer
 from rich.console import Console
@@ -173,7 +175,13 @@ def chat(
         "--mode",
         "-m",
         help="Chat mode: grounded (default), concise, critic, or explain",
-    )
+    ),
+    conversational: bool = typer.Option(
+        settings.enable_conversation_memory,
+        "--conversational",
+        "-c",
+        help="Enable conversational memory (remembers context across turns)",
+    ),
 ):
     """
     Interactive chat interface for testing RAG system.
@@ -186,6 +194,11 @@ def chat(
       - concise: Brief 1-3 sentence answers
       - critic: Verify if context supports claims
       - explain: Show reasoning steps
+      
+    Conversational mode (v1.4):
+      - Remembers conversation history within session
+      - Allows follow-up questions and refinement
+      - Use --conversational flag or set ARQ_ENABLE_CONVERSATION_MEMORY=true
     """
     # Map mode to prompt template
     mode_prompts = {
@@ -202,16 +215,30 @@ def chat(
         console.print("[yellow]Available modes:[/yellow] grounded, concise, critic, explain")
         raise typer.Exit(1)
     
-    console.print(f"[bold cyan]ArquimedesAI Chat ({mode_lower} mode)[/bold cyan]")
+    # Display header
+    header = f"ArquimedesAI Chat ({mode_lower} mode"
+    if conversational:
+        header += ", conversational"
+    header += ")"
+    console.print(f"[bold cyan]{header}[/bold cyan]")
     console.print("[dim]Type 'exit', 'quit', or 'q' to exit[/dim]\n")
     
     try:
         # Load RAG chain with selected mode
         console.print(f"[cyan]Loading RAG chain with {mode_lower} mode...[/cyan]")
         rag_chain = RAGChain(prompt_template=mode_prompts[mode_lower])
-        console.print("✓ Chain loaded\n")
+        
+        # Create conversational chain if enabled
+        if conversational:
+            session_id = str(uuid.uuid4())
+            conv_chain = rag_chain.create_conversational_chain()
+            config = {"configurable": {"session_id": session_id}}
+            console.print(f"✓ Chain loaded with conversational memory (session: {session_id[:8]}...)\n")
+        else:
+            console.print("✓ Chain loaded (single-turn mode)\n")
         
         # Interactive loop
+        turn_count = 0
         while True:
             try:
                 # Get user input
@@ -220,7 +247,9 @@ def chat(
                 
                 # Check for exit commands
                 if user_input.lower() in ["exit", "quit", "q"]:
-                    console.print("\n[cyan]Goodbye![/cyan]")
+                    if conversational and turn_count > 0:
+                        console.print(f"\n[dim]Session ended after {turn_count} turn(s)[/dim]")
+                    console.print("[cyan]Goodbye![/cyan]")
                     break
                 
                 # Skip empty input
@@ -229,7 +258,15 @@ def chat(
                 
                 # Process query
                 console.print("[cyan]ArquimedesAI is thinking...[/cyan]")
-                response = rag_chain.invoke(user_input)
+                
+                if conversational:
+                    # Use conversational chain with session
+                    response = conv_chain.invoke({"input": user_input}, config)
+                else:
+                    # Use standard single-turn chain
+                    response = rag_chain.invoke(user_input)
+                
+                turn_count += 1
                 
                 # Display answer
                 console.print("\n[bold green]ArquimedesAI:[/bold green]")

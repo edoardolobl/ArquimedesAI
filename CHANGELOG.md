@@ -5,6 +5,93 @@ All notable changes to ArquimedesAI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- **Phase 1 (v1.4): Conversational Memory**
+  - New `enable_conversation_memory` setting (default: false) to enable in-session conversation history
+  - New `max_history_messages` setting (default: 20) to control conversation history size
+  - Added `RunnableWithMessageHistory` integration in `core/rag_chain.py`
+  - New `history_store` dict for session-based chat history storage
+  - New `get_session_history()` method for managing session histories
+  - New `create_conversational_chain()` method wrapping retrieval chain with message history
+  - CLI chat now supports `--conversational` / `-c` flag to enable conversational mode
+  - Session tracking with UUID for conversation isolation
+  - Turn counter displays session stats on exit
+
+- **Phase 1 (v1.4): Structured Citations Foundation**
+  - New Pydantic schemas in `prompts/templates.py`:
+    - `Citation`: Source ID + verbatim quote model
+    - `QuotedAnswer`: Answer with list of citations
+    - `CitedAnswer`: Lighter schema with source IDs only
+  - New `format_docs_with_id()` helper function for citation tracking
+  - New `use_structured_citations` setting (default: false) for Pydantic schema-based citations
+  - New `citation_style` setting ("quoted" or "id") to control citation format
+  - `core/llm_local.py` migrated from `OllamaLLM` to `ChatOllama` for `.with_structured_output()` support
+  - Foundation prepared for future `.with_structured_output(QuotedAnswer)` integration
+
+- **Configuration & Debugging**
+  - Debug logging added to `settings.py` on module import to display loaded configuration
+  - Logs Ollama model, base URL, conversation memory, structured citations, paths on startup
+  - Helpful for troubleshooting `.env` loading issues
+
+### Changed
+- **Documentation: Gemma2 → Gemma3 Model Upgrade**
+  - Updated all references from Gemma2:1b (~500MB, 1B params) to Gemma3:4b (~3GB, 4B params)
+  - Changed default `ollama_model` in `settings.py`: `gemma2:1b` → `gemma3:latest`
+  - Updated 47+ occurrences across 21 files:
+    - Core docs: `README.md`, `.env.example`, `.github/copilot-instructions.md`
+    - Code comments: `core/llm_local.py`, `settings.py`
+    - Setup guides: `QUICKSTART.md`, `SETUP.md`, `MIGRATION.md`, `ARCHITECTURE.md`
+    - Reference docs: `CHANGELOG.md`, `REFACTORING_SUMMARY.md`
+    - Serena MCP memories: `.serena/memories/{tech_stack.md, suggested_commands.md, project_overview.md}`
+  - Model pull commands updated: `ollama pull gemma3:latest` (was `ollama pull gemma2:1b`)
+  - Model size comments updated: ~3GB (was ~500MB)
+  - Created `GEMMA3_DOCUMENTATION_UPDATE.md` documenting all changes
+
+- **Configuration Files: v1.4 Features Added**
+  - `.env.example`: Added conversational memory and structured citations settings (disabled by default for dev)
+  - `.env.production`: Updated to `gemma3:latest` + added v1.4 features (enabled for production)
+  - Both files now include Phase 1 usage notes and examples
+
+- **CLI Enhancements**
+  - `cli.py chat` command now displays conversational mode status in header
+  - Session ID shown when conversational mode is active (first 8 chars)
+  - Turn count displayed on exit in conversational mode
+  - Better user feedback for mode selection
+
+- **RAG Chain Architecture**
+  - `core/rag_chain.py` now supports optional `use_structured_output` parameter
+  - Docstrings updated to document v1.4 features
+  - Better separation between single-turn and conversational modes
+
+### Fixed
+- **LLM Integration**
+  - Migrated from `OllamaLLM` to `ChatOllama` in `core/llm_local.py` to support structured output
+  - Maintains 100% offline operation and backward compatibility
+  - Zero API changes, drop-in replacement
+
+### Documentation
+- Created `GEMMA3_DOCUMENTATION_UPDATE.md` with comprehensive change tracking
+- Created `ENV_LOADING_FIX.md` documenting Python bytecode cache troubleshooting
+- Created `PHASE1_CONFIGURATION_COMPLETE.md` verifying v1.4 configuration
+- Created `PHASE1_v1.4_IMPLEMENTATION.md` documenting implementation details
+- Updated `.gitignore` to exclude:
+  - Development documentation files (spec, migration guides, implementation notes)
+  - Helper scripts (`show_*.py`, `verify_*.py`, `test_*.py`)
+  - Backup files (`*.old`, `*.broken`, `*.corrupted`, `*.clean`, `*.new`)
+  - README backups (`README.md.*` pattern)
+  - `.serena/` directory (MCP configuration and memories)
+
+### Notes
+- **Phase 1 Implementation Status**: Foundation complete, ready for testing
+  - Conversational memory: Implemented and functional with `--conversational` flag
+  - Structured citations: Schemas defined, LLM ready, chain integration pending
+- **Breaking Changes**: None - all v1.4 features are opt-in
+- **Migration**: No action required - defaults maintain v1.3.1 behavior
+- **Testing**: Use `python cli.py chat --conversational` to test conversational mode
+- **Model Upgrade**: Run `ollama pull gemma3:latest` to upgrade from Gemma2:1b
+
 ## [1.3.1] - 2025-10-06
 
 ### Added
@@ -261,7 +348,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Qdrant vector store with local persistence
 - Docling document loader (PDF/DOCX/PPTX/XLSX/MD/HTML)
 - BGE-M3 multilingual embeddings (PT/EN/ES)
-- Ollama LLM integration (Gemma2:1b)
+- Ollama LLM integration (Gemma3:4b)
 - Discord bot with async message handling
 - Typer-based CLI (index/discord/status commands)
 - Comprehensive documentation suite

@@ -2,11 +2,12 @@
 LLM integration using Ollama for local inference.
 
 Provides interface to Ollama models running locally for generation.
+Uses ChatOllama for structured output support.
 """
 
 import logging
 
-from langchain_ollama import OllamaLLM
+from langchain_ollama import ChatOllama
 
 from settings import settings
 
@@ -20,7 +21,7 @@ class LLMManager:
     Provides a configured Ollama instance for use in RAG chains.
     
     Attributes:
-        model_name: Ollama model identifier (e.g., gemma2:1b)
+        model_name: Ollama model identifier (e.g., gemma3:latest)
         base_url: Ollama API endpoint
         temperature: Generation temperature
         llm: Ollama LLM instance
@@ -48,19 +49,19 @@ class LLMManager:
         logger.info(f"API endpoint: {self.base_url}")
         logger.info(f"Temperature: {self.temperature}")
         
-        self.llm = OllamaLLM(
+        self.llm = ChatOllama(
             model=self.model_name,
             base_url=self.base_url,
             temperature=self.temperature,
         )
         
-        logger.info("✓ LLM initialized")
+        logger.info("✓ LLM initialized (ChatOllama with structured output support)")
     
-    def get_llm(self) -> OllamaLLM:
+    def get_llm(self) -> ChatOllama:
         """
         Get Ollama LLM instance.
         
         Returns:
-            Configured Ollama instance for use in chains
+            Configured ChatOllama instance for use in chains (supports structured output)
         """
         return self.llm

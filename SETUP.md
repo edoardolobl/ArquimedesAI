@@ -13,7 +13,7 @@ Complete setup instructions for getting ArquimedesAI running on your local machi
 
 ### 1. Install Ollama (Manual - Required)
 
-Ollama provides the local LLM (Gemma2:1b) for answer generation.
+Ollama provides the local LLM (Gemma3:4b) for answer generation.
 
 **macOS:**
 ```bash
@@ -38,12 +38,12 @@ Or download from: https://ollama.ai/download
 # Start Ollama service (separate terminal)
 ollama serve
 
-# Pull Gemma2:1b model (~500MB)
-ollama pull gemma2:1b
+# Pull Gemma3 model (~3GB)
+ollama pull gemma3:latest
 
 # Verify installation
 ollama list
-# Should show: gemma2:1b
+# Should show: gemma3:latest
 ```
 
 ### 3. Install Python Dependencies
@@ -126,10 +126,10 @@ python cli.py discord
 
 | Model | Type | Size | Download Timing |
 |-------|------|------|----------------|
-| **Gemma2:1b** | LLM | ~500MB | **Manual** - `ollama pull gemma2:1b` |
+| **Gemma3:4b** | LLM | ~3GB | **Manual** - `ollama pull gemma3:latest` |
 | **BGE-M3** | Embeddings | ~2GB | **Automatic** - First `index` command |
 | **bge-reranker-v2-m3** | Reranker | ~500MB | **Automatic** - When `ARQ_RERANK_ENABLED=true` |
-| **Total** | | **~3GB** | ~5-10 min on fast connection |
+| **Total** | | **~5.5GB** | ~5-10 min on fast connection |
 
 ## Configuration Comparison
 
@@ -168,10 +168,10 @@ curl http://localhost:11434/api/tags
 ollama serve
 ```
 
-### "Model gemma2:1b not found"
+### "Model not found" error
 ```bash
-# Pull the model
-ollama pull gemma2:1b
+# Pull the Gemma3 model
+ollama pull gemma3:latest
 
 # Verify
 ollama list

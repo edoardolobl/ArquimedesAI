@@ -13,7 +13,7 @@
 │   User Actions   │         │   External Deps   │
 ├──────────────────┤         ├──────────────────┤
 │ • Add docs       │         │ • Ollama         │
-│   to data/       │         │   (gemma2:1b)    │
+│   to data/       │         │   (gemma3:4b)    │
 │ • Run CLI        │         │ • HuggingFace    │
 │ • Discord        │         │   (BGE-M3)       │
 │   mention        │         └──────────────────┘
@@ -37,7 +37,7 @@
 │  Pydantic Settings from .env:                                        │
 │  • ARQ_DATA_DIR, ARQ_STORAGE_DIR                                    │
 │  • ARQ_EMBED_MODEL (BAAI/bge-m3)                                    │
-│  • ARQ_OLLAMA_MODEL (gemma2:1b)                                     │
+│  • ARQ_OLLAMA_MODEL (gemma3:latest)                                 │
 │  • ARQ_TOP_K, ARQ_CHUNK_SIZE                                        │
 │  • ARQ_DISCORD_TOKEN                                                │
 └─────────────────────────────────────────────────────────────────────┘
@@ -105,7 +105,7 @@ Discord Mention: "@ArquimedesAI What is X?"
 │  HybridRetriever     │              │   LLMManager     │
 │                      │              │                  │
 │ • BM25 + Dense (RRF) │              │ • Ollama client  │
-│ • Top-K: 8           │              │ • gemma2:1b      │
+│ • Top-K: 8           │              │ • gemma3:latest  │
 └──────────────────────┘              │ • Temperature: 0.3│
       │                                └──────────────────┘
       ▼                                          │
@@ -152,7 +152,7 @@ data/*.pdf → Docling HybridChunker → BGE-M3 → Qdrant (HNSW optimized)
 
 Phase 2: QUERYING (Real-time)
 ─────────────────────────────
-Discord query → Hybrid Retrieval (BM25+Dense) → Optional Reranking → Context → Gemma2 LLM → Answer
+Discord query → Hybrid Retrieval (BM25+Dense) → Optional Reranking → Context → Gemma3 LLM → Answer
 
 
 ════════════════════════════════════════════════════════════════════════

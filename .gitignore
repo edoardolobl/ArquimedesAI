@@ -34,6 +34,9 @@ wheels/
 *.swo
 *~
 
+# GitHub/AI Assistant Configuration
+.github/
+
 # Project-specific
 data/
 storage/
@@ -45,6 +48,12 @@ MIGRATION.md
 REFACTORING_SUMMARY.md
 DOCLING_UPGRADE_v1.3.md
 TESTING_v1.2.md
+PROJECT_QUALITY_AUDIT.md
+ENV_LOADING_FIX.md
+PHASE1_CONFIGURATION_COMPLETE.md
+PHASE1_v1.4_IMPLEMENTATION.md
+GEMMA3_DOCUMENTATION_UPDATE.md
+DEPRECATION_FIXES_v1.3.1.md
 *.reference
 *.backup
 
@@ -59,9 +68,19 @@ Thumbs.db
 # Testing
 test_*.py
 verify_*.py
+show_*.py
 .pytest_cache/
 .coverage
 htmlcov/
+
+# Backup files
+*.old
+*.broken
+*.corrupted
+*.clean
+*.new
+README.md.backup
+README.md.*
 
 # Mypy
 .mypy_cache/

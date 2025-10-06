@@ -32,7 +32,7 @@ class Settings(BaseSettings):
         chunk_overlap: Character overlap between chunks
         hybrid: Enable hybrid retrieval (dense + sparse)
         ollama_base: Ollama HTTP API base URL
-        ollama_model: Ollama model name (e.g., gemma2:1b)
+        ollama_model: Ollama model name (e.g., gemma3:latest)
         ollama_temperature: LLM generation temperature
         discord_token: Discord bot authentication token
     """
@@ -169,7 +169,7 @@ class Settings(BaseSettings):
         description="Ollama API base URL"
     )
     ollama_model: str = Field(
-        default="gemma2:1b",
+        default="gemma3:latest",
         description="Ollama model name"
     )
     ollama_temperature: float = Field(
@@ -177,6 +177,28 @@ class Settings(BaseSettings):
         ge=0.0,
         le=1.0,
         description="LLM generation temperature (0=deterministic, 1=creative)"
+    )
+    
+    # Conversational Memory (v1.4 Phase 1)
+    enable_conversation_memory: bool = Field(
+        default=False,
+        description="Enable in-session conversational memory (RunnableWithMessageHistory)"
+    )
+    max_history_messages: int = Field(
+        default=20,
+        ge=1,
+        le=100,
+        description="Maximum number of messages to keep in conversation history"
+    )
+    
+    # Structured Citations (v1.4 Phase 1)
+    use_structured_citations: bool = Field(
+        default=False,
+        description="Enable structured citations with Pydantic schemas (QuotedAnswer)"
+    )
+    citation_style: Literal["quoted", "id"] = Field(
+        default="quoted",
+        description="Citation style: 'quoted' (with verbatim quotes) or 'id' (source IDs only)"
     )
     
     # Discord Bot
@@ -204,3 +226,17 @@ class Settings(BaseSettings):
 
 # Global settings instance
 settings = Settings()
+
+# Debug: Log loaded settings on import (helpful for troubleshooting .env issues)
+import logging
+_logger = logging.getLogger(__name__)
+_logger.debug("=" * 60)
+_logger.debug("ArquimedesAI Settings Loaded")
+_logger.debug("=" * 60)
+_logger.debug(f"Ollama Model: {settings.ollama_model}")
+_logger.debug(f"Ollama Base URL: {settings.ollama_base}")
+_logger.debug(f"Conversation Memory: {settings.enable_conversation_memory}")
+_logger.debug(f"Structured Citations: {settings.use_structured_citations}")
+_logger.debug(f"Data Directory: {settings.data_dir}")
+_logger.debug(f"Qdrant Path: {settings.qdrant_path}")
+_logger.debug("=" * 60)
