@@ -5,13 +5,7 @@
 </p>
 
 <p align="center">
-  <st# Start Ollama server (separate terminal)
-ollama serve
-
-# Pull the Gemma3 model (~3GB)
-ollama pull gemma3:latest
-
-# Clone and setup>100% Open-Source, Self-Hosted RAG Chatbot</strong><br>
+  <strong>100% Open-Source, Self-Hosted RAG Chatbot</strong><br>
   <em>Runs locally on modest hardware (8-16GB RAM)</em>
 </p>
 
@@ -26,22 +20,41 @@ ollama pull gemma3:latest
 
 ---
 
-## 🆕 What's New in v1.3.1
+## 🆕 What's New in v2.0
 
-### LangChain 1.0 Ready
-- ✅ **Ollama Migration**: Updated to official `langchain-ollama` package
-- ✅ **Modern Retrieval API**: BaseRetriever using `.invoke()` pattern (LCEL)
-- ✅ **Secure Caching**: SHA-256 key encoder for embeddings cache
+### 🎯 Semantic Routing System
+- **Intelligent Query Classification**: Automatic domain detection (GTM Q&A, Generation, Validation, General Chat)
+- **Two-Stage Routing**: Keyword pre-filtering + semantic classification (89.5% accuracy)
+- **Hybrid Routing**: BM25 (70%) + BGE-M3 (30%) for robust classification
+- **Visual Indicators**: Route-specific emojis (📚 Q&A, 🛠️ Generation, ✅ Validation, 💬 General)
 
-### HNSW Optimization
-- �� **Better Accuracy**: Configurable HNSW parameters (`m=32`, `ef_construct=256`)
-- 💾 **Lower Memory**: On-disk storage for production deployments
-- ⚡ **Balanced Performance**: Optimized for both speed and quality
+### 🏷️ GTM Domain Expertise
+- **Specialized Prompts**: Domain-specific templates for Google Tag Manager taxonomy
+- **Three GTM Modes**: Q&A (questions), Generation (tag/trigger creation), Validation (config review)
+- **Portuguese-First**: Brazilian Portuguese with technical term preservation
+- **73 Training Utterances**: Curated examples for accurate route classification
 
-### Docling Integration (v1.3)
-- 📄 **Structure-Aware Chunking**: Preserves document hierarchy and formatting
-- 🔍 **Rich Metadata**: Page numbers, bounding boxes, section context
-- 📊 **Table Extraction**: Accurate table parsing with OCR support
+### 💬 Conversational Memory (Optional)
+- **Session-Based History**: In-session chat context preservation
+- **Configurable History**: Control conversation length (default: 20 messages)
+- **CLI Flag**: `--conversational` / `-c` to enable multi-turn conversations
+- **Turn Tracking**: Session stats displayed on exit
+
+### 📝 Structured Citations Foundation
+- **Pydantic Schemas**: `Citation`, `QuotedAnswer`, `CitedAnswer` models ready
+- **ChatOllama Migration**: Supports `.with_structured_output()` for future integration
+- **ID-Based Tracking**: `format_docs_with_id()` helper for citation grounding
+
+### 🚀 Enhanced CLI
+- **Routing Flag**: `--enable-routing` / `-r` to activate semantic routing
+- **Mode Selection**: Combine routing with conversational, styles, or single-turn
+- **Mutual Exclusivity**: Clear errors when incompatible flags combined
+- **Confidence Display**: See routing confidence scores in output
+
+### 🔧 Previous Updates (v1.3.1)
+- **LangChain 1.0 Ready**: Official `langchain-ollama`, `.invoke()` LCEL pattern, SHA-256 cache
+- **HNSW Optimization**: Better accuracy (`m=32`, `ef_construct=256`), lower memory (on-disk)
+- **Docling Integration**: Structure-aware chunking, rich metadata, table extraction with OCR
 
 [See full changelog →](CHANGELOG.md)
 
@@ -86,11 +99,18 @@ User Query → Hybrid Retrieval → [BM25 40% + Dense 60%] → Reranker (optiona
 - **Rerank with cross-encoder** (precision filtering)
 - **Return top 3** (highly relevant results)
 
-**Generation**: Gemma3 4B LLM generates grounded answers
+**Generation**: Gemma3 4B LLM generates grounded answers with domain-specific prompts
 
----
-- Explicit citations from retrieved context
-- Multiple prompt modes: grounded, concise, critic, explain
+**v2.0 Routing** (optional): Semantic query classification
+- Two-stage routing: keyword pre-filtering + semantic classification
+- Routes: GTM Q&A, GTM Generation, GTM Validation, General Chat
+- Hybrid classification: BM25 (70%) + BGE-M3 (30%) for 89.5% accuracy
+- Domain-specific prompts optimize for task type
+
+**v2.0 Conversational** (optional): Multi-turn chat with history
+- Session-based message history (configurable length)
+- Context preservation across conversation turns
+- Compatible with routing and style modes
 
 ### Directory Structure
 
@@ -98,17 +118,20 @@ User Query → Hybrid Retrieval → [BM25 40% + Dense 60%] → Reranker (optiona
 arquimedesai/
 ├── core/                  # RAG components
 │   ├── embedder.py       # BGE-M3 with caching
-│   ├── llm_local.py      # Ollama integration
+│   ├── llm_local.py      # Ollama (ChatOllama) integration
 │   ├── vector_store.py   # Qdrant with HNSW
 │   ├── hybrid_retriever.py  # BM25 + Dense
 │   ├── reranker.py       # Cross-encoder reranking
+│   ├── prompt_router.py  # Semantic routing (v2.0)
 │   └── rag_chain.py      # LangChain LCEL chains
 ├── ingest/               # Document processing
 │   └── loaders.py        # Docling integration
 ├── bots/                 # Interfaces
 │   └── discord_bot.py    # Discord bot
 ├── prompts/              # Prompt templates
-│   └── templates.py      # 4 modes (grounded/concise/critic/explain)
+│   ├── templates.py      # Base templates & Pydantic schemas
+│   ├── base_prompts.py   # Reusable prompt components (v2.0)
+│   └── gtm_prompts.py    # GTM domain-specific prompts (v2.0)
 ├── data/                 # Your documents (gitignored)
 ├── storage/              # Vector store & cache (gitignored)
 ├── cli.py                # Command-line interface
@@ -157,24 +180,30 @@ cp .env.example .env
 python cli.py index
 
 # 7. Start chatting!
-python cli.py chat                    # CLI interface
-python cli.py chat --mode concise     # Brief answers
-python cli.py discord                 # Discord bot
+python cli.py chat                              # CLI interface (single-turn)
+python cli.py chat --enable-routing             # With semantic routing (v2.0)
+python cli.py chat --conversational             # Multi-turn conversation (v2.0)
+python cli.py chat -r -c                        # Routing + Conversational (v2.0)
+python cli.py chat --mode concise               # Brief answers
+python cli.py discord                           # Discord bot
 ```
 
 ### First Query
 
 ```
-$ python cli.py chat
+$ python cli.py chat --enable-routing
 
-ArquimedesAI Chat (grounded mode)
+ArquimedesAI Chat (grounded mode, routing enabled)
 Type 'exit', 'quit', or 'q' to exit
 
 ✓ Chain loaded
+✓ Routing enabled (4 routes available)
 
-You: What are the main topics in my documents?
+You: O que é uma tag GTM?
 
-ArquimedesAI: Based on your documents, the main topics are...
+[Route: 📚 gtm_qa (confidence: 0.95)]
+ArquimedesAI: Uma tag GTM (Google Tag Manager) é um fragmento de código JavaScript...
+```
 ```
 
 ---
@@ -297,10 +326,17 @@ python cli.py index --rebuild                # Full rebuild
 python cli.py index --data-dir ./my-docs     # Custom directory
 
 # Chat modes
-python cli.py chat                           # Default (grounded)
+python cli.py chat                           # Default (grounded, single-turn)
 python cli.py chat --mode concise            # Brief answers
 python cli.py chat --mode critic             # Verify claims
 python cli.py chat --mode explain            # Show reasoning
+
+# v2.0 Features: Routing and Conversational
+python cli.py chat --enable-routing          # Semantic routing (domain detection)
+python cli.py chat -r                        # Short flag for routing
+python cli.py chat --conversational          # Multi-turn conversation
+python cli.py chat -c                        # Short flag for conversational
+python cli.py chat -r -c                     # Routing + Conversational (combined)
 
 # Discord bot
 python cli.py discord                        # Start Discord bot

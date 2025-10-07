@@ -11,7 +11,7 @@ ArquimedesAI is a **100% open-source, self-hosted RAG (Retrieval Augmented Gener
 ### Three-Layer Design
 1. **Ingestion** (`ingest/`): Docling loaders → HybridChunker (structure-aware) → BGE-M3 embeddings → Qdrant
 2. **Retrieval** (`core/`): Query → HybridRetriever (BM25 + Dense via RRF) → Optional Reranking → Top-K chunks
-3. **Generation** (`core/`): Retrieved chunks + mode-specific prompt → Ollama LLM (Gemma2:1b) → Grounded answer
+3. **Generation** (`core/`): Retrieved chunks + mode-specific prompt → Ollama LLM (Gemma3:4b) → Grounded answer
 4. **Interfaces** (`bots/`, `cli.py`): Discord bot (async) or CLI chat with modes (sync) invoke RAG chain
 
 ```
@@ -23,7 +23,7 @@ User Query (CLI/Discord) → RAGChain → HybridRetriever → [BM25 + Qdrant] �
 - **`core/hybrid_retriever.py`**: HybridRetriever combining BM25Retriever + Qdrant via EnsembleRetriever
 - **`core/reranker.py`**: RerankerManager with HuggingFace cross-encoder (bge-reranker-v2-m3)
 - **`core/rag_chain.py`**: RAGChain using LangChain LCEL, supports custom prompts and reranking
-- **`core/llm_local.py`**: LLMManager wrapping Ollama with Gemma2:1b
+- **`core/llm_local.py`**: LLMManager wrapping Ollama with Gemma3:4b
 - **`core/embedder.py`**: EmbeddingManager with BGE-M3 + CacheBackedEmbeddings
 - **`ingest/loaders.py`**: DocumentLoader using Docling with HybridChunker (structure-aware, tokenization-optimized)
 - **`bots/discord_bot.py`**: DiscordChatbot with async edit-message pattern
@@ -160,9 +160,9 @@ Cache path: `./storage/embeddings_cache/` (gitignored).
 
 ### 7. Ollama Local LLM Integration
 - LLM runs **locally via Ollama** HTTP API (default: `http://localhost:11434`)
-- Current model: **Gemma2:1b** (configurable via `ARQ_OLLAMA_MODEL`)
+- Current model: **Gemma3:4b** (gemma3:latest) (configurable via `ARQ_OLLAMA_MODEL`)
 - Use `langchain_community.llms.Ollama` class (wrapped in `core/llm_local.py`)
-- **Assumption**: Ollama service is running and model is pre-pulled (`ollama pull gemma2:1b`)
+- **Assumption**: Ollama service is running and model is pre-pulled (`ollama pull gemma3:latest`)
 
 ### 8. Async Discord Bot Pattern
 - Bot uses `discord.py` with `Intents.all()` and `message_content=True`
@@ -195,7 +195,7 @@ pip install -r requirements.txt
 
 # Start Ollama (separate terminal)
 ollama serve
-ollama pull gemma2:1b
+ollama pull gemma3:latest
 
 # Configure (create .env or set environment variables)
 cp .env.example .env
@@ -277,7 +277,7 @@ Before implementing features from `ArquimedesAI_Spec_Full_v1.1.md`:
 - **`core/hybrid_retriever.py`**: BM25 + Dense hybrid retrieval with EnsembleRetriever
 - **`core/reranker.py`**: Cross-encoder reranking with HuggingFace models (v1.2)
 - **`core/rag_chain.py`**: LangChain LCEL chains for retrieval + generation + reranking
-- **`core/llm_local.py`**: Ollama LLM wrapper (Gemma2:1b)
+- **`core/llm_local.py`**: Ollama LLM wrapper (Gemma3:4b)
 - **`core/embedder.py`**: BGE-M3 embeddings with caching
 - **`ingest/loaders.py`**: Docling-based document loading with HybridChunker (v1.3)
 - **`bots/discord_bot.py`**: Async Discord bot interface

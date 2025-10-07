@@ -196,7 +196,7 @@ ARQ_QDRANT_ON_DISK=true
 **Documented evolution:**
 - v0.1.0 (2023-08): Haystack + BERT + SQLite
 - v0.2.0 (2024-01): LangChain + Mistral 7B + FAISS
-- v1.0.0: Qdrant + Gemma2 + BGE-M3 + Modern architecture
+- v1.0.0: Qdrant + Gemma3 + BGE-M3 + Modern architecture
 - v1.1.0 (2025-10-05): Hybrid retrieval + CLI chat
 - v1.2.0 (2025-10-05): Reranking + Multi-mode prompts
 - v1.3.0 (2025-10-05): Docling integration + Structure-aware chunking

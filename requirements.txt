@@ -45,3 +45,6 @@ pytest-asyncio>=0.24.0
 ruff>=0.8.0
 mypy>=1.13.0
 
+# Semantic Routing (v1.4)
+semantic-router[local]>=0.1.11  # Local execution with HuggingFace + BM25 encoders (installed: 0.1.11)
+

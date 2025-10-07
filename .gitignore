@@ -36,11 +36,13 @@ wheels/
 
 # GitHub/AI Assistant Configuration
 .github/
+.serena/
 
 # Project-specific
 data/
 storage/
 embeddings_cache/
+*.pdf
 
 # Development Documentation
 ArquimedesAI_Spec_Full_v1.1.md
@@ -54,6 +56,18 @@ PHASE1_CONFIGURATION_COMPLETE.md
 PHASE1_v1.4_IMPLEMENTATION.md
 GEMMA3_DOCUMENTATION_UPDATE.md
 DEPRECATION_FIXES_v1.3.1.md
+
+# Implementation & Integration Documents (Development Artifacts)
+*_IMPLEMENTATION_*.md
+*_INTEGRATION_*.md
+*_ROUTING_*.md
+*_SEMANTIC_*.md
+V2.0_*.md
+PHASE*.md
+CLI_ROUTING_*.md
+ROUTING_CONVERSATIONAL_*.md
+
+# Reference files
 *.reference
 *.backup
 
@@ -69,6 +83,8 @@ Thumbs.db
 test_*.py
 verify_*.py
 show_*.py
+tests/manual/
+scripts/
 .pytest_cache/
 .coverage
 htmlcov/
@@ -86,3 +102,14 @@ README.md.*
 .mypy_cache/
 .dmypy.json
 dmypy.json
+
+# Specific v1.4 Implementation Docs (Development Artifacts)
+IMPLEMENTATION_COMPLETE_v1.4.md
+IMPLEMENTATION_SUMMARY_v1.4.md
+INTEGRATION_STATUS_v1.4.md
+TEST_RESULTS_v1.4.md
+CLI_ROUTING_INTEGRATION_COMPLETE.md
+SEMANTIC_ROUTING_v1.4.md
+SEMANTIC_ROUTING_QUICKREF.md
+SEMANTIC_ROUTING_QUICK_REFERENCE_v1.4.md
+ROUTING_CONVERSATIONAL_COMPATIBILITY_ANALYSIS.md

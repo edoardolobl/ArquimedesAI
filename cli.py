@@ -174,7 +174,7 @@ def chat(
         "grounded",
         "--mode",
         "-m",
-        help="Chat mode: grounded (default), concise, critic, or explain",
+        help="Chat mode for general queries: grounded (default), concise, critic, or explain",
     ),
     conversational: bool = typer.Option(
         settings.enable_conversation_memory,
@@ -184,39 +184,43 @@ def chat(
     ),
 ):
     """
-    Interactive chat interface for testing RAG system.
+    Interactive chat interface for testing RAG system (v2.0).
     
     Requires existing index (run 'arquimedes index' first).
     Type 'exit', 'quit', or 'q' to exit.
     
-    Modes:
+    Modes (for general queries):
       - grounded: Detailed answers with citations (default)
       - concise: Brief 1-3 sentence answers
       - critic: Verify if context supports claims
       - explain: Show reasoning steps
       
-    Conversational mode (v1.4):
+    Semantic Routing (v2.0 - ALWAYS ON):
+      - Automatically detects GTM-specific queries and routes to specialized prompts
+      - Routes: gtm_qa (Q&A), gtm_generation (tag creation), gtm_validation (tag review)
+      - 89.5% accuracy with hybrid BM25+semantic routing
+      - Mode flag only affects general (non-GTM) queries
+      - Can be disabled via ARQ_DISABLE_ROUTING=true in .env
+      
+    Conversational mode (v2.0 - COMPATIBLE WITH ROUTING):
       - Remembers conversation history within session
-      - Allows follow-up questions and refinement
+      - Allows follow-up questions and refinement  
+      - Works seamlessly with semantic routing!
       - Use --conversational flag or set ARQ_ENABLE_CONVERSATION_MEMORY=true
     """
-    # Map mode to prompt template
-    mode_prompts = {
-        "grounded": GROUNDED_PROMPT,
-        "concise": CONCISE_PROMPT,
-        "critic": CRITIC_PROMPT,
-        "explain": EXPLAIN_PROMPT,
-    }
+    # Map mode to style (for display purposes)
+    valid_modes = ["grounded", "concise", "critic", "explain"]
     
     # Validate mode
     mode_lower = mode.lower()
-    if mode_lower not in mode_prompts:
+    if mode_lower not in valid_modes:
         console.print(f"[red]Error:[/red] Invalid mode '{mode}'")
-        console.print("[yellow]Available modes:[/yellow] grounded, concise, critic, explain")
+        console.print(f"[yellow]Available modes:[/yellow] {', '.join(valid_modes)}")
         raise typer.Exit(1)
     
     # Display header
-    header = f"ArquimedesAI Chat ({mode_lower} mode"
+    routing_status = "disabled" if settings.disable_routing else "enabled"
+    header = f"ArquimedesAI Chat v2.0 ({mode_lower} mode, routing {routing_status}"
     if conversational:
         header += ", conversational"
     header += ")"
@@ -224,18 +228,28 @@ def chat(
     console.print("[dim]Type 'exit', 'quit', or 'q' to exit[/dim]\n")
     
     try:
-        # Load RAG chain with selected mode
-        console.print(f"[cyan]Loading RAG chain with {mode_lower} mode...[/cyan]")
-        rag_chain = RAGChain(prompt_template=mode_prompts[mode_lower])
+        # Load RAG chain (routing enabled by default in v2.0)
+        console.print(f"[cyan]Loading RAG chain ({mode_lower} mode)...[/cyan]")
         
-        # Create conversational chain if enabled
+        # Create RAGChain with routing enabled (unless disabled in settings)
+        rag_chain = RAGChain(enable_routing=not settings.disable_routing)
+        
         if conversational:
+            # Conversational mode with routing
             session_id = str(uuid.uuid4())
-            conv_chain = rag_chain.create_conversational_chain()
+            conv_chain = rag_chain.create_conversational_chain(style=mode_lower)
             config = {"configurable": {"session_id": session_id}}
-            console.print(f"✓ Chain loaded with conversational memory (session: {session_id[:8]}...)\n")
+            
+            if settings.disable_routing:
+                console.print(f"✓ Chain loaded with conversational memory (session: {session_id[:8]}..., routing disabled)\n")
+            else:
+                console.print(f"✓ Chain loaded with conversational memory + routing (session: {session_id[:8]}...)\n")
         else:
-            console.print("✓ Chain loaded (single-turn mode)\n")
+            # Single-turn mode with routing
+            if settings.disable_routing:
+                console.print("✓ Chain loaded (single-turn mode, routing disabled)\n")
+            else:
+                console.print("✓ Chain loaded with routing (single-turn mode)\n")
         
         # Interactive loop
         turn_count = 0
@@ -260,11 +274,11 @@ def chat(
                 console.print("[cyan]ArquimedesAI is thinking...[/cyan]")
                 
                 if conversational:
-                    # Use conversational chain with session
+                    # Use conversational chain (with routing if enabled)
                     response = conv_chain.invoke({"input": user_input}, config)
                 else:
-                    # Use standard single-turn chain
-                    response = rag_chain.invoke(user_input)
+                    # Use standard chain (with routing if enabled)
+                    response = rag_chain.invoke(user_input, style=mode_lower)
                 
                 turn_count += 1
                 

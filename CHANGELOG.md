@@ -5,98 +5,131 @@ All notable changes to ArquimedesAI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
-
-### Changed
-- **Reranker Output Optimization**: Increased `ARQ_RERANK_TOP_N` from 3 to 5 to better utilize Gemma3's 128K context window
-  - More context chunks reach the LLM for improved answer quality
-  - Low-risk optimization with high impact potential
-  - Updated in `settings.py`, `.env.example`, and `.env.production`
+## [2.0.0] - 2025-10-07
 
 ### Added
-- **Phase 1 (v1.4): Conversational Memory**
-  - New `enable_conversation_memory` setting (default: false) to enable in-session conversation history
-  - New `max_history_messages` setting (default: 20) to control conversation history size
-  - Added `RunnableWithMessageHistory` integration in `core/rag_chain.py`
-  - New `history_store` dict for session-based chat history storage
-  - New `get_session_history()` method for managing session histories
-  - New `create_conversational_chain()` method wrapping retrieval chain with message history
-  - CLI chat now supports `--conversational` / `-c` flag to enable conversational mode
+
+- **Semantic Routing System** (`core/prompt_router.py`)
+  - Two-stage routing: keyword pre-filtering + semantic classification
+  - Four routes: `general_chat`, `gtm_qa`, `gtm_generation`, `gtm_validation`
+  - Hybrid routing: BM25 (70%) + BGE-M3 (30%) with alpha=0.3
+  - Route confidence scoring and visual indicators (📚 Q&A, 🛠️ Generation, ✅ Validation, 💬 General)
+  - 89.5% classification accuracy on test queries
+  - CLI integration: `--enable-routing` / `-r` flag
+
+- **GTM Domain Expertise** (`prompts/gtm_prompts.py`)
+  - Domain-specific prompt templates for Google Tag Manager taxonomy
+  - Three specialized modes:
+    - **Q&A**: GTM taxonomy questions, platform expertise
+    - **Generation**: Tag/trigger/variable creation with validation
+    - **Validation**: Configuration review and auditing
+  - 73 curated training utterances for route classification
+  - Split architecture: base system prompts + LangChain template format
+  - Brazilian Portuguese-first with technical term preservation
+
+- **Base Prompt System** (`prompts/base_prompts.py`)
+  - Reusable prompt components following prompt engineering best practices
+  - `create_base_system_prompt()`: Template builder with role, constraints, output format
+  - Language enforcement for Brazilian Portuguese
+  - Style modifiers: `concise`, `detailed`, `explain_reasoning`, `critic`
+  - `format_context_documents()`: Helper for context formatting
+  - `apply_style_modifier()`: Dynamic prompt transformation
+
+- **Conversational Memory** (v1.4 Phase 1)
+  - Session-based chat history with `RunnableWithMessageHistory`
+  - New `enable_conversation_memory` setting (default: false)
+  - New `max_history_messages` setting (default: 20)
+  - CLI flag: `--conversational` / `-c` for multi-turn conversations
   - Session tracking with UUID for conversation isolation
   - Turn counter displays session stats on exit
+  - Compatible with routing and style modes
 
-- **Phase 1 (v1.4): Structured Citations Foundation**
-  - New Pydantic schemas in `prompts/templates.py`:
+- **Structured Citations Foundation** (v1.4 Phase 1)
+  - Pydantic schemas in `prompts/templates.py`:
     - `Citation`: Source ID + verbatim quote model
     - `QuotedAnswer`: Answer with list of citations
     - `CitedAnswer`: Lighter schema with source IDs only
-  - New `format_docs_with_id()` helper function for citation tracking
-  - New `use_structured_citations` setting (default: false) for Pydantic schema-based citations
-  - New `citation_style` setting ("quoted" or "id") to control citation format
-  - `core/llm_local.py` migrated from `OllamaLLM` to `ChatOllama` for `.with_structured_output()` support
-  - Foundation prepared for future `.with_structured_output(QuotedAnswer)` integration
+  - `format_docs_with_id()`: Helper for citation tracking with source IDs
+  - New `use_structured_citations` setting (default: false)
+  - New `citation_style` setting ("quoted" or "id")
+  - Foundation prepared for `.with_structured_output()` integration
 
-- **Configuration & Debugging**
-  - Debug logging added to `settings.py` on module import to display loaded configuration
-  - Logs Ollama model, base URL, conversation memory, structured citations, paths on startup
-  - Helpful for troubleshooting `.env` loading issues
+- **CLI Enhancements** (`cli.py`)
+  - Route-specific visual indicators (emojis) in output
+  - Route confidence display: `[Route: 📚 gtm_qa (confidence: 0.95)]`
+  - Conversational mode status in chat header
+  - Session ID display when conversational mode active
+  - Turn count on exit for conversational sessions
+  - Mutual exclusivity enforcement: clear errors when combining incompatible flags
+  - Updated docstrings with semantic routing and conversational documentation
 
 ### Changed
-- **Documentation: Gemma2 → Gemma3 Model Upgrade**
-  - Updated all references from Gemma2:1b (~500MB, 1B params) to Gemma3:4b (~3GB, 4B params)
-  - Changed default `ollama_model` in `settings.py`: `gemma2:1b` → `gemma3:latest`
-  - Updated 47+ occurrences across 21 files:
-    - Core docs: `README.md`, `.env.example`, `.github/copilot-instructions.md`
-    - Code comments: `core/llm_local.py`, `settings.py`
-    - Setup guides: `QUICKSTART.md`, `SETUP.md`, `MIGRATION.md`, `ARCHITECTURE.md`
-    - Reference docs: `CHANGELOG.md`, `REFACTORING_SUMMARY.md`
-    - Serena MCP memories: `.serena/memories/{tech_stack.md, suggested_commands.md, project_overview.md}`
-  - Model pull commands updated: `ollama pull gemma3:latest` (was `ollama pull gemma2:1b`)
-  - Model size comments updated: ~3GB (was ~500MB)
-  - Created `GEMMA3_DOCUMENTATION_UPDATE.md` documenting all changes
 
-- **Configuration Files: v1.4 Features Added**
-  - `.env.example`: Added conversational memory and structured citations settings (disabled by default for dev)
-  - `.env.production`: Updated to `gemma3:latest` + added v1.4 features (enabled for production)
-  - Both files now include Phase 1 usage notes and examples
+- **Model Upgrade**: Gemma2:1b → Gemma3:4b (Gemma3:latest)
+  - Updated default `ollama_model` in `settings.py`
+  - Updated 47+ references across 21 files
+  - Model size: ~500MB → ~3GB
+  - Parameters: 1B → 4B for better reasoning
+  - Pull command: `ollama pull gemma3:latest`
 
-- **CLI Enhancements**
-  - `cli.py chat` command now displays conversational mode status in header
-  - Session ID shown when conversational mode is active (first 8 chars)
-  - Turn count displayed on exit in conversational mode
-  - Better user feedback for mode selection
-
-- **RAG Chain Architecture**
-  - `core/rag_chain.py` now supports optional `use_structured_output` parameter
-  - Docstrings updated to document v1.4 features
-  - Better separation between single-turn and conversational modes
-
-### Fixed
-- **LLM Integration**
-  - Migrated from `OllamaLLM` to `ChatOllama` in `core/llm_local.py` to support structured output
-  - Maintains 100% offline operation and backward compatibility
+- **LLM Integration** (`core/llm_local.py`)
+  - Migrated from `OllamaLLM` to `ChatOllama`
+  - Enables `.with_structured_output()` support for Pydantic schemas
+  - Maintains 100% offline operation
   - Zero API changes, drop-in replacement
 
+- **RAG Chain Architecture** (`core/rag_chain.py`)
+  - Now supports optional `use_structured_output` parameter
+  - Integrated `QueryRouter` for semantic routing (optional)
+  - Added `create_conversational_chain()` for multi-turn conversations
+  - `history_store` dict for session-based chat history
+  - Better separation between single-turn and conversational modes
+  - Routing-aware prompt selection logic
+
+- **Configuration**
+  - Debug logging in `settings.py` on module import
+  - Logs Ollama model, base URL, conversation memory, structured citations, paths
+  - Updated `.env.example` with v1.4 features (disabled by default for dev)
+  - Updated `.env.production` with v1.4 features (enabled for production)
+  - Reranker optimization: `ARQ_RERANK_TOP_N` 3 → 5 for better context utilization
+
+### Testing
+
+- **Routing Validation**
+  - `test_routing_quick.py`: Validates all 4 routes with real queries
+  - `test_semantic_routing.py`: Comprehensive routing accuracy tests
+  - `test_cli_routing.py`: CLI integration with routing flag
+  - `test_v2_complete.py`, `test_v2_final.py`: End-to-end v2.0 validation
+
+- **Conversational Mode**
+  - `test_conversational_and_styles.py`: Multi-turn conversation testing
+  - 4-turn conversation with history accumulation verified
+  - Routing works correctly across conversation turns
+  - History preservation validated
+
+### Migration Notes
+
+- **No Breaking Changes**: All v2.0 features are opt-in
+- **Routing**: Use `--enable-routing` or `-r` flag in CLI chat
+- **Conversational**: Use `--conversational` or `-c` flag in CLI chat
+- **Model Upgrade**: Run `ollama pull gemma3:latest` (recommended)
+- **Compatibility**: v1.3.1 behavior maintained when new features disabled
+- **Dependencies**: Install `semantic-router` for routing features
+
 ### Documentation
-- Created `GEMMA3_DOCUMENTATION_UPDATE.md` with comprehensive change tracking
-- Created `ENV_LOADING_FIX.md` documenting Python bytecode cache troubleshooting
-- Created `PHASE1_CONFIGURATION_COMPLETE.md` verifying v1.4 configuration
-- Created `PHASE1_v1.4_IMPLEMENTATION.md` documenting implementation details
-- Updated `.gitignore` to exclude:
-  - Development documentation files (spec, migration guides, implementation notes)
-  - Helper scripts (`show_*.py`, `verify_*.py`, `test_*.py`)
-  - Backup files (`*.old`, `*.broken`, `*.corrupted`, `*.clean`, `*.new`)
-  - README backups (`README.md.*` pattern)
-  - `.serena/` directory (MCP configuration and memories)
+
+- Created `CLI_ROUTING_INTEGRATION_COMPLETE.md`: Full routing integration guide
+- Created `PHASE1_v1.4_IMPLEMENTATION.md`: v1.4 Phase 1 implementation details
+- Created `PHASE1_CONFIGURATION_COMPLETE.md`: v1.4 configuration verification
+- Created `GEMMA3_DOCUMENTATION_UPDATE.md`: Model upgrade documentation
+- Updated `.gitignore`: Exclude dev docs, test scripts, backup files, `.serena/`
+- Updated README.md: v2.0 features, CLI examples, architecture updates
+- Updated ARCHITECTURE.md: v2.0 routing layer, query pipeline, component dependencies
+
+## [Unreleased]
 
 ### Notes
-- **Phase 1 Implementation Status**: Foundation complete, ready for testing
-  - Conversational memory: Implemented and functional with `--conversational` flag
-  - Structured citations: Schemas defined, LLM ready, chain integration pending
-- **Breaking Changes**: None - all v1.4 features are opt-in
-- **Migration**: No action required - defaults maintain v1.3.1 behavior
-- **Testing**: Use `python cli.py chat --conversational` to test conversational mode
-- **Model Upgrade**: Run `ollama pull gemma3:latest` to upgrade from Gemma2:1b
+- Future features and improvements will be documented here
 
 ## [1.3.1] - 2025-10-06
 

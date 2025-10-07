@@ -191,6 +191,13 @@ class Settings(BaseSettings):
         description="Maximum number of messages to keep in conversation history"
     )
     
+    # Semantic Routing (v2.0)
+    disable_routing: bool = Field(
+        default=False,
+        env="ARQ_DISABLE_ROUTING",
+        description="Disable semantic routing (default: False, routing enabled)"
+    )
+    
     # Structured Citations (v1.4 Phase 1)
     use_structured_citations: bool = Field(
         default=False,
