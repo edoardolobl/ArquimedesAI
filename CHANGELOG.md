@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Hybrid routing: BM25 (70%) + BGE-M3 (30%) with alpha=0.3
   - Route confidence scoring and visual indicators (📚 Q&A, 🛠️ Generation, ✅ Validation, 💬 General)
   - 89.5% classification accuracy on test queries
-  - CLI integration: `--enable-routing` / `-r` flag
+  - **Enabled by default** - disable with `ARQ_DISABLE_ROUTING=true` in .env
 
 - **GTM Domain Expertise** (`prompts/gtm_prompts.py`)
   - Domain-specific prompt templates for Google Tag Manager taxonomy
@@ -109,11 +109,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Migration Notes
 
-- **No Breaking Changes**: All v2.0 features are opt-in
-- **Routing**: Use `--enable-routing` or `-r` flag in CLI chat
+- **No Breaking Changes**: All v2.0 features maintain backward compatibility
+- **Routing**: Enabled by default - set `ARQ_DISABLE_ROUTING=true` in .env to disable
 - **Conversational**: Use `--conversational` or `-c` flag in CLI chat
 - **Model Upgrade**: Run `ollama pull gemma3:latest` (recommended)
-- **Compatibility**: v1.3.1 behavior maintained when new features disabled
+- **Compatibility**: v1.3.1 behavior maintained when routing disabled
 - **Dependencies**: Install `semantic-router` for routing features
 
 ### Documentation

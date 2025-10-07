@@ -46,10 +46,11 @@
 - **ID-Based Tracking**: `format_docs_with_id()` helper for citation grounding
 
 ### 🚀 Enhanced CLI
-- **Routing Flag**: `--enable-routing` / `-r` to activate semantic routing
-- **Mode Selection**: Combine routing with conversational, styles, or single-turn
-- **Mutual Exclusivity**: Clear errors when incompatible flags combined
-- **Confidence Display**: See routing confidence scores in output
+- **Conversational Mode**: `--conversational` / `-c` for multi-turn conversations
+- **Routing Always On**: Automatic domain detection (GTM Q&A, Generation, Validation)
+- **Mode Selection**: Combine conversational with styles (grounded, concise, critic, explain)
+- **Disable Routing**: Set `ARQ_DISABLE_ROUTING=true` in .env if needed
+- **Confidence Display**: See routing confidence scores in chat output
 
 ### 🔧 Previous Updates (v1.3.1)
 - **LangChain 1.0 Ready**: Official `langchain-ollama`, `.invoke()` LCEL pattern, SHA-256 cache
@@ -180,10 +181,9 @@ cp .env.example .env
 python cli.py index
 
 # 7. Start chatting!
-python cli.py chat                              # CLI interface (single-turn)
-python cli.py chat --enable-routing             # With semantic routing (v2.0)
+python cli.py chat                              # CLI interface (default: routing enabled)
 python cli.py chat --conversational             # Multi-turn conversation (v2.0)
-python cli.py chat -r -c                        # Routing + Conversational (v2.0)
+python cli.py chat -c                           # Short flag for conversational
 python cli.py chat --mode concise               # Brief answers
 python cli.py discord                           # Discord bot
 ```
@@ -191,9 +191,9 @@ python cli.py discord                           # Discord bot
 ### First Query
 
 ```
-$ python cli.py chat --enable-routing
+$ python cli.py chat
 
-ArquimedesAI Chat (grounded mode, routing enabled)
+ArquimedesAI Chat v2.0 (grounded mode, routing enabled)
 Type 'exit', 'quit', or 'q' to exit
 
 ✓ Chain loaded
@@ -325,17 +325,19 @@ python cli.py index --rebuild                # Full rebuild
 python cli.py index --data-dir ./my-docs     # Custom directory
 
 # Chat modes
-python cli.py chat                           # Default (grounded, single-turn)
+python cli.py chat                           # Default (grounded, routing enabled)
 python cli.py chat --mode concise            # Brief answers
 python cli.py chat --mode critic             # Verify claims
 python cli.py chat --mode explain            # Show reasoning
 
-# v2.0 Features: Routing and Conversational
-python cli.py chat --enable-routing          # Semantic routing (domain detection)
-python cli.py chat -r                        # Short flag for routing
+# v2.0 Features: Conversational Memory
 python cli.py chat --conversational          # Multi-turn conversation
 python cli.py chat -c                        # Short flag for conversational
-python cli.py chat -r -c                     # Routing + Conversational (combined)
+python cli.py chat -c --mode concise         # Conversational + brief answers
+
+# Disable routing (if needed)
+# Set ARQ_DISABLE_ROUTING=true in .env, then:
+python cli.py chat                           # Routing disabled
 
 # Discord bot
 python cli.py discord                        # Start Discord bot
@@ -406,11 +408,11 @@ python cli.py chat --mode explain
 ## 🔄 Development Milestones
 
 ### v2.0.0 (2025-10-07) - Semantic Routing & GTM Domain Expertise
-- 🎯 Semantic routing system (89.5% accuracy, 4 routes)
+- 🎯 Semantic routing system (89.5% accuracy, 4 routes, **enabled by default**)
 - 🏷️ GTM domain-specific prompts (Q&A, Generation, Validation)
 - 💬 Conversational memory (session-based, optional)
 - 📝 Structured citations foundation (Pydantic schemas)
-- 🚀 Enhanced CLI (--enable-routing, --conversational flags)
+- 🚀 Enhanced CLI (--conversational flag, routing always on)
 
 ### v1.3.1 (2025-10-06) - LangChain 1.0 Ready
 - ✅ Migrated to `langchain-ollama` official package
