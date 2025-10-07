@@ -68,7 +68,7 @@ ArquimedesAI is a production-ready **Retrieval Augmented Generation (RAG)** chat
 
 - 🔒 **100% Local & Private**: No cloud dependencies, your data never leaves your machine
 - 🚀 **Production-Ready**: Built with LangChain 0.3+, Qdrant vector store, and modern architecture
-- �� **Multilingual**: Native support for Portuguese, English, Spanish, and 100+ languages
+- 🌍 **Multilingual**: Native support for Portuguese, English, Spanish, and 100+ languages
 - ⚡ **Efficient**: Optimized for 8-16GB RAM systems with hybrid retrieval and HNSW indexing
 - 🎯 **Advanced Retrieval**: Hybrid search (BM25 + Dense) with optional cross-encoder reranking
 - 📚 **Rich Document Support**: PDF, DOCX, PPTX, XLSX, Markdown, HTML, and images (with OCR)
@@ -97,7 +97,7 @@ User Query → Hybrid Retrieval → [BM25 40% + Dense 60%] → Reranker (optiona
 
 - **Fetch 50 candidates** (broad net for recall)
 - **Rerank with cross-encoder** (precision filtering)
-- **Return top 3** (highly relevant results)
+- **Return top 5** (highly relevant results)
 
 **Generation**: Gemma3 4B LLM generates grounded answers with domain-specific prompts
 
@@ -204,7 +204,6 @@ You: O que é uma tag GTM?
 [Route: 📚 gtm_qa (confidence: 0.95)]
 ArquimedesAI: Uma tag GTM (Google Tag Manager) é um fragmento de código JavaScript...
 ```
-```
 
 ---
 
@@ -227,7 +226,7 @@ ARQ_EMBED_MODEL=BAAI/bge-m3         # Multilingual embeddings (1024 dim)
 
 # Vector Store
 ARQ_QDRANT_PATH=./storage/qdrant    # Local storage path
-ARQ_TOP_K=5                         # Results per query
+ARQ_TOP_K=8                         # Results per query
 ```
 
 #### Hybrid Retrieval (Recommended)
@@ -244,7 +243,7 @@ ARQ_DENSE_WEIGHT=0.6                # Semantic importance
 # Cross-Encoder Reranking (improves relevance)
 ARQ_RERANK_ENABLED=true
 ARQ_RERANK_MODEL=BAAI/bge-reranker-v2-m3
-ARQ_RERANK_TOP_N=3
+ARQ_RERANK_TOP_N=5
 
 # Docling OCR (for scanned PDFs/images)
 ARQ_DOCLING_OCR=true                # Enable OCR (slower but accurate)
@@ -305,10 +304,10 @@ First pull the model: `ollama pull gemma3:9b`
 Adjust retrieval behavior:
 
 ```bash
-ARQ_TOP_K=5                    # Number of chunks to retrieve (3-10)
+ARQ_TOP_K=8                    # Number of chunks to retrieve (3-10)
 ARQ_BM25_WEIGHT=0.4           # Increase for keyword-heavy docs
 ARQ_DENSE_WEIGHT=0.6          # Increase for semantic queries
-ARQ_RERANK_TOP_N=3            # Final results after reranking (1-5)
+ARQ_RERANK_TOP_N=5            # Final results after reranking (1-10)
 ```
 
 [See `.env.example` for all options →](.env.example)
@@ -405,6 +404,13 @@ python cli.py chat --mode explain
 ---
 
 ## 🔄 Development Milestones
+
+### v2.0.0 (2025-10-07) - Semantic Routing & GTM Domain Expertise
+- 🎯 Semantic routing system (89.5% accuracy, 4 routes)
+- 🏷️ GTM domain-specific prompts (Q&A, Generation, Validation)
+- 💬 Conversational memory (session-based, optional)
+- 📝 Structured citations foundation (Pydantic schemas)
+- 🚀 Enhanced CLI (--enable-routing, --conversational flags)
 
 ### v1.3.1 (2025-10-06) - LangChain 1.0 Ready
 - ✅ Migrated to `langchain-ollama` official package
