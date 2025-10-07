@@ -157,10 +157,10 @@ class Settings(BaseSettings):
         description="HuggingFace cross-encoder model for reranking"
     )
     rerank_top_n: int = Field(
-        default=3,
+        default=5,
         ge=1,
         le=20,
-        description="Number of documents to return after reranking"
+        description="Number of documents to return after reranking (increased to better utilize 128K context window)"
     )
     
     # LLM (Ollama)

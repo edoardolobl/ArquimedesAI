@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Reranker Output Optimization**: Increased `ARQ_RERANK_TOP_N` from 3 to 5 to better utilize Gemma3's 128K context window
+  - More context chunks reach the LLM for improved answer quality
+  - Low-risk optimization with high impact potential
+  - Updated in `settings.py`, `.env.example`, and `.env.production`
+
 ### Added
 - **Phase 1 (v1.4): Conversational Memory**
   - New `enable_conversation_memory` setting (default: false) to enable in-session conversation history
