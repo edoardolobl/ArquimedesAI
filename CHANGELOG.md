@@ -5,6 +5,71 @@ All notable changes to ArquimedesAI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2025-10-07
+
+### Added
+
+- **Premium UI/UX Design** - Complete visual overhaul inspired by ChatGPT, Claude, and Perplexity
+  - **Glassmorphism Effects**: Backdrop-filter blur on chat messages with semi-transparent backgrounds
+  - **Gradient Accents**: Linear gradients on buttons, backgrounds, and elevated elements
+  - **Logo Integration**: ArquimedesAI logo displayed with native Streamlit rendering (100px, rounded corners)
+  - **Professional Typography**: Inter font family from Google Fonts with refined size scale
+  - **Custom Animations**: Smooth fade-in, slide-up, and pulse animations for enhanced UX
+  - **Wider Sidebar**: Increased from 21rem to 28rem for better content fit (no text cutoff)
+  - **Premium Color Palette**: Ant Design Dark inspired with Daybreak Blue (#177ddc) primary
+  - **Routing Badge Glows**: Subtle glow effects on routing indicators (success/warning/info colors)
+  - **Custom Scrollbar**: Gradient-styled scrollbar matching the premium theme
+
+- **New Styling Module** (`interfaces/streamlit/styles.py`) - 473 lines
+  - Comprehensive CSS system with CSS custom properties (variables)
+  - Glassmorphism card styling for chat messages
+  - Status indicators with pulsing dot animations
+  - Enhanced button hover effects with transform and shadow
+  - Responsive design breakpoints for mobile compatibility
+  - Utility classes for common effects (fade-in, slide-up, glows)
+
+- **Streamlit Theme Configuration** (`.streamlit/config.toml`) - 50 lines
+  - Dark theme foundation with semantic colors
+  - Primary/secondary background layers (#0a0e27, #141b2d)
+  - Success/warning/error color definitions
+  - Typography settings (font size, weights, code styling)
+  - Border and radius configurations for modern rounded corners
+
+### Changed
+
+- **Logo Display**: Switched from HTML base64 encoding to native `st.image()` for reliability
+  - Removed GTM-specific subtitle "v2.2.0 • Intelligent GTM Assistant" for broader applicability
+  - Increased logo size from 80px to 100px for better visibility
+  - Improved alignment with 2-column layout (1:2 ratio) and centered vertically
+  - Logo now renders correctly without broken image issues
+
+- **Removed Legacy CSS**: Eliminated conflicting inline CSS in `app.py`
+  - Centralized all styling in `styles.py` module for maintainability
+  - Removed basic `.stChatMessage` and `.route-badge` styling
+  - Cleaner separation of concerns (logic vs styling)
+
+### Design Research
+
+- **Streamlit Theme API**: Configuration options and theming capabilities
+- **Ant Design Dark Mode**: Professional color palette and semantic color system
+- **Modern AI Patterns**: ChatGPT clean hierarchy, Claude typography, Perplexity gradients
+- **Glassmorphism Techniques**: Backdrop-filter blur with transparency and saturation
+- **Premium SaaS Inspiration**: Linear micro-interactions, Vercel gradient accents, Stripe shadows
+
+### Technical Implementation
+
+- Premium CSS with CSS custom properties for maintainability
+- LangChain LCEL pattern preserved (no breaking changes to RAG chain)
+- Native Streamlit components for better performance and reliability
+- No external dependencies added (uses built-in Streamlit capabilities)
+- Chrome DevTools tested for visual verification
+
+### Files Modified
+
+- `interfaces/streamlit/app.py`: Logo display, CSS injection, removed legacy styles
+- `interfaces/streamlit/styles.py`: Premium CSS module (NEW)
+- `.streamlit/config.toml`: Theme configuration (NEW)
+
 ## [2.1.2] - 2025-10-07
 
 ### Fixed
