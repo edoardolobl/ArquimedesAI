@@ -1,0 +1,50 @@
+# ArquimedesAI Premium Theme Configuration v2.2.0
+# Based on Ant Design Dark Mode + Modern AI Chat Patterns
+
+[theme]
+# Base theme (dark mode)
+base = "dark"
+
+# Primary accent color (Daybreak Blue)
+primaryColor = "#177ddc"
+
+# Main background (deep blue-black for premium feel)
+backgroundColor = "#0a0e27"
+
+# Secondary background (elevated elements like sidebar, cards)
+secondaryBackgroundColor = "#141b2d"
+
+# Primary text color (high contrast white)
+textColor = "#f1f5f9"
+
+# Font family
+font = "sans serif"
+
+# Semantic colors from Ant Design Dark palette
+blueColor = "#177ddc"          # Primary - Daybreak Blue
+greenColor = "#6abe39"         # Success - Polar Green
+yellowColor = "#e8b339"        # Warning - Calendula Gold
+redColor = "#e84749"           # Error - Dust Red
+
+# Border and visual elements
+borderColor = "rgba(255, 255, 255, 0.1)"
+showWidgetBorder = true
+showSidebarBorder = true
+
+# Border radius (modern rounded corners)
+baseRadius = "1rem"
+buttonRadius = "0.75rem"
+
+# Typography settings
+baseFontSize = 16
+baseFontWeight = 400
+headingFontWeights = [700, 600, 600, 600, 600, 600]
+
+# Code styling
+codeBackgroundColor = "rgba(10, 14, 39, 0.8)"
+codeFontSize = "0.875rem"
+
+[server]
+# Development settings
+headless = false
+runOnSave = true

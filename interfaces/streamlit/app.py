@@ -22,6 +22,7 @@ sys.path.insert(0, str(project_root))
 from core.rag_chain import RAGChain
 from core.vector_store import QdrantVectorStore
 from settings import settings
+from interfaces.streamlit.styles import get_custom_css
 
 # Route emojis
 ROUTE_EMOJIS = {
@@ -39,23 +40,16 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Custom CSS for better chat appearance
-st.markdown("""
-<style>
-    .stChatMessage {
-        padding: 1rem;
-        border-radius: 0.5rem;
-    }
-    .route-badge {
-        display: inline-block;
-        padding: 0.2rem 0.5rem;
-        border-radius: 0.25rem;
-        background-color: #f0f2f6;
-        font-size: 0.8rem;
-        margin-top: 0.5rem;
-    }
-</style>
-""", unsafe_allow_html=True)
+# ============================================================================
+# PREMIUM STYLING v2.2.0 - Inject Custom CSS
+# ============================================================================
+st.markdown(get_custom_css(), unsafe_allow_html=True)
+
+# ============================================================================
+# LOGO HEADER (Premium Design)
+# ============================================================================
+# Note: Logo display and premium CSS styling are loaded from styles.py
+# All custom styling is centralized in interfaces/streamlit/styles.py
 
 
 def check_ollama_connection():
@@ -174,7 +168,19 @@ async def stream_rag_response(chain, input_data):
 
 # Sidebar Configuration
 with st.sidebar:
-    st.title("⚙️ ArquimedesAI")
+    # Premium logo display (v2.2.0) - Using native Streamlit for better rendering
+    col1, col2 = st.columns([1, 2])
+    with col1:
+        st.image("assets/arquimedesai.jpg", width=100)
+    with col2:
+        st.markdown("""
+        <div style="padding-top: 20px;">
+            <h1 style="margin: 0; font-size: 1.8rem; color: #f1f5f9; font-weight: 600;">ArquimedesAI</h1>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    st.markdown("---")  # Visual separator
+    
     st.markdown("### Configuration")
     
     # Status indicators
