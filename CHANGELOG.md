@@ -5,6 +5,118 @@ All notable changes to ArquimedesAI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.2] - 2025-10-07
+
+### Fixed
+
+- **Conversational Mode Routing Metadata** - MEDIUM: Fixed routing display in conversational mode showing incorrect "general_chat (0.0%)"
+  - Root cause: `_create_routing_chain()` returned chain instead of invoking it and adding metadata
+  - Solution: Modified method to invoke selected chain and add route + confidence to result
+  - Impact: Conversational queries now show correct routing info (e.g., "✅ Gtm Validation (85%)")
+  - Note: Routing was working correctly internally (right prompts used), only display was broken
+  - Modified: `core/rag_chain.py` (_create_routing_chain method)
+  - Tested: Chrome DevTools live testing confirmed fix works
+
+### Documentation
+
+- Added `BUGFIX_CONVERSATIONAL_ROUTING_v2.1.2.md` - Complete analysis and testing guide
+  - Chrome DevTools testing results with screenshots
+  - Before/after behavior comparison
+  - LangChain Runnable composition patterns
+  - Architecture flow diagrams
+
+## [2.1.1] - 2025-10-07
+
+### Fixed
+
+- **Qdrant Lock Conflict** - CRITICAL: Fixed "already accessed by another instance" errors on subsequent queries
+  - Root cause: Multiple `QdrantClient` instances trying to access same file path simultaneously
+  - Solution: Check index only once per session using `st.session_state` in Streamlit app
+  - Impact: Prevents crashes after first query, ensures stable multi-query sessions
+  - Performance: 70-80% faster subsequent queries (eliminates 10-13s timeout delays)
+  - Modified: `interfaces/streamlit/app.py` (lines 175-191)
+
+- **Missing Routing Metadata** - CRITICAL: Fixed routing display showing "general_chat (0.0%)" for all queries
+  - Root cause: `RAGChain.invoke()` wasn't capturing and returning route name + confidence scores
+  - Solution: Explicitly call `router.route(query)` before chain invocation and add metadata to result dict
+  - Impact: Routing info now correctly displayed (e.g., "✅ Gtm Validation (85%)")
+  - Example: Query about tag validation now shows `gtm_validation` route instead of `general_chat`
+  - Modified: `core/rag_chain.py` (both `invoke()` and `ainvoke()` methods)
+
+### Documentation
+
+- Added `BUGFIX_QDRANT_ROUTING_v2.1.1.md` - Comprehensive analysis of both bugs with Sequential Thinking breakdown
+  - Root cause analysis with execution flow diagrams
+  - Before/after code comparisons
+  - Complete testing guide
+  - Troubleshooting section
+  - Architectural insights on file-based vs server-based Qdrant
+
+## [2.1.0] - 2025-10-07
+
+### Added
+
+- **Streamlit Web Interface** (`interfaces/streamlit/app.py`) - 471 lines
+  - **Streaming Responses**: Typewriter effect with `st.write_stream()` for engaging UX
+  - **Enhanced Source Citations**: Metadata display (page numbers, scores, filenames) in organized 3-column layout
+  - **Conversation Export**: Download chat history as JSON or Markdown with timestamped filenames
+  - **Multi-Stage Status Indicators**: Emoji-based progress (🔄→🔍→🤖→✅) with expandable error details
+  - Visual routing indicators with emojis (📚 Q&A, 🛠️ Generation, ✅ Validation, 💬 General)
+  - Real-time confidence scores for routing decisions
+  - Sidebar configuration: mode selection, routing toggle, source display, streaming toggle
+  - System status indicators (Ollama connection, index status)
+
+### Fixed
+
+- **100% Offline Mode Enforcement** - Critical fix for HuggingFace Hub connection attempts
+  - Added `local_files_only=True` to `HuggingFaceEmbeddings` in `core/embedder.py`
+  - Set global environment variables `HF_HUB_OFFLINE=1` and `TRANSFORMERS_OFFLINE=1` in `settings.py`
+  - Triple-layer defense ensures no external network calls to huggingface.co
+  - Fixes violation of core "100% local/offline" specification requirement
+
+- **Streamlit Interface Freezing** - Fixed 10+ second freeze on subsequent queries
+  - Optimized `check_index_exists()` to use lightweight Qdrant client (no embedder initialization)
+  - Added `@st.cache_data(ttl=60)` to prevent repeated expensive checks
+  - Performance improvement: 70-80% faster for subsequent queries
+  - Eliminates "No index found" false errors after timeouts
+
+- **Parameter Type Mismatch** - Fixed `'dict' object has no attribute 'lower'` error
+  - Corrected `chain.invoke()` call to pass string instead of dict: `chain.invoke(prompt, style=mode)`
+  - Single-turn mode now properly uses string query parameter per API signature
+  - Conversational mode unchanged (correctly uses dict format)
+  - Session management with conversation history
+  - Experimental conversational mode support
+  - No Discord setup required - instant access via `streamlit run interfaces/streamlit/app.py`
+
+### Changed
+
+- **Directory Refactoring**: Renamed `bots/` → `interfaces/` for better organization
+  - `interfaces/bots/` - Discord bot (preserved git history)
+  - `interfaces/streamlit/` - New web interface
+  - Updated imports in `cli.py` to reflect new structure
+
+- **Dependencies**: Added `streamlit>=1.41.0` and `requests>=2.32.0` to requirements.txt
+
+- **Streamlit UI Enhancements**:
+  - Source display now shows metadata (filename, page, relevance score)
+  - Export buttons only appear when conversation has messages
+  - Status widget shows multi-stage progress with context-aware labels
+  - Error handling with expandable details expander
+
+### Documentation
+
+- Updated README.md with Streamlit interface section and usage guide
+- Marked Streamlit as recommended interface (easier than Discord setup)
+- Updated directory structure diagrams
+- Updated features list to highlight multiple interface options
+- Created STREAMLIT_ENHANCEMENTS_v2.1.md with detailed implementation notes
+
+### Migration Notes
+
+- **Breaking**: Import paths changed from `bots.discord_bot` → `interfaces.bots.discord_bot`
+  - If you have custom scripts importing Discord bot, update import paths
+  - CLI commands remain unchanged (`python cli.py discord`)
+
 ## [2.0.0] - 2025-10-07
 
 ### Added

@@ -51,10 +51,15 @@ class EmbeddingManager:
         # Ensure cache directory exists
         self.cache_path.mkdir(parents=True, exist_ok=True)
         
-        # Initialize base embeddings
+        # Initialize base embeddings with offline mode
+        # NOTE: local_files_only=True prevents HuggingFace Hub connections
+        # Models must be pre-downloaded on first run with internet access
         self.base_embedder = HuggingFaceEmbeddings(
             model_name=self.model_name,
-            model_kwargs={"device": "cpu"},  # Use CPU for compatibility
+            model_kwargs={
+                "device": "cpu",  # Use CPU for compatibility
+                "local_files_only": True,  # 100% offline mode - no HF Hub connections
+            },
             encode_kwargs={"normalize_embeddings": True},  # L2 normalization
         )
         

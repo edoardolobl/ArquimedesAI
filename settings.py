@@ -234,6 +234,12 @@ class Settings(BaseSettings):
 # Global settings instance
 settings = Settings()
 
+# Set HuggingFace Hub to offline mode for 100% local operation
+# This prevents any network calls to huggingface.co during model loading
+import os
+os.environ["HF_HUB_OFFLINE"] = "1"
+os.environ["TRANSFORMERS_OFFLINE"] = "1"
+
 # Debug: Log loaded settings on import (helpful for troubleshooting .env issues)
 import logging
 _logger = logging.getLogger(__name__)
@@ -246,4 +252,5 @@ _logger.debug(f"Conversation Memory: {settings.enable_conversation_memory}")
 _logger.debug(f"Structured Citations: {settings.use_structured_citations}")
 _logger.debug(f"Data Directory: {settings.data_dir}")
 _logger.debug(f"Qdrant Path: {settings.qdrant_path}")
+_logger.debug(f"Offline Mode: HF_HUB_OFFLINE={os.environ.get('HF_HUB_OFFLINE')}")
 _logger.debug("=" * 60)

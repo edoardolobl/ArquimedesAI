@@ -154,7 +154,7 @@ def discord(
         console.print("✓ Chain loaded\n")
         
         # Import and start bot
-        from bots.discord_bot import DiscordChatbot
+        from interfaces.bots.discord_bot import DiscordChatbot
         
         console.print("[cyan]Starting Discord bot...[/cyan]")
         console.print("[yellow]Press Ctrl+C to stop[/yellow]\n")

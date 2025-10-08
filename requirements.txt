@@ -27,8 +27,10 @@ pydantic>=2.10.0
 pydantic-settings>=2.6.0
 python-dotenv>=1.0.0
 
-# Discord Bot
-discord.py>=2.4.0
+# Interfaces
+discord.py>=2.4.0  # Discord bot interface
+streamlit>=1.41.0  # Web chat interface
+requests>=2.32.0  # For Ollama health checks in Streamlit
 
 # CLI
 typer>=0.15.0

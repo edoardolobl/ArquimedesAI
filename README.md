@@ -73,7 +73,7 @@ ArquimedesAI is a production-ready **Retrieval Augmented Generation (RAG)** chat
 - ⚡ **Efficient**: Optimized for 8-16GB RAM systems with hybrid retrieval and HNSW indexing
 - 🎯 **Advanced Retrieval**: Hybrid search (BM25 + Dense) with optional cross-encoder reranking
 - 📚 **Rich Document Support**: PDF, DOCX, PPTX, XLSX, Markdown, HTML, and images (with OCR)
-- 🤖 **Multiple Interfaces**: CLI chat for testing, Discord bot for production use
+- 🤖 **Multiple Interfaces**: Web UI (Streamlit), CLI chat, and Discord bot
 
 ---
 
@@ -127,8 +127,11 @@ arquimedesai/
 │   └── rag_chain.py      # LangChain LCEL chains
 ├── ingest/               # Document processing
 │   └── loaders.py        # Docling integration
-├── bots/                 # Interfaces
-│   └── discord_bot.py    # Discord bot
+├── interfaces/           # User interfaces
+│   ├── bots/             # Chat bots
+│   │   └── discord_bot.py  # Discord bot
+│   └── streamlit/        # Web interface
+│       └── app.py        # Streamlit chat UI
 ├── prompts/              # Prompt templates
 │   ├── templates.py      # Base templates & Pydantic schemas
 │   ├── base_prompts.py   # Reusable prompt components (v2.0)
@@ -255,12 +258,14 @@ ARQ_QDRANT_HNSW_EF_CONSTRUCT=256   # Build quality (100-512)
 ARQ_QDRANT_ON_DISK=true            # Lower memory usage
 ```
 
-#### Discord Bot
+#### Discord Bot (Optional)
 
 ```bash
 ARQ_DISCORD_TOKEN=your_bot_token_here
 ARQ_DISCORD_PREFIX=!                # Command prefix (optional)
 ```
+
+**Note**: Discord bot is optional. Use the Streamlit web interface for easier access without bot setup.
 
 ### Understanding .env Settings
 
@@ -339,12 +344,36 @@ python cli.py chat -c --mode concise         # Conversational + brief answers
 # Set ARQ_DISABLE_ROUTING=true in .env, then:
 python cli.py chat                           # Routing disabled
 
+# Web interface (Streamlit) - RECOMMENDED
+streamlit run interfaces/streamlit/app.py    # Start web UI
+
 # Discord bot
 python cli.py discord                        # Start Discord bot
 
 # System status
 python cli.py status                         # Show configuration
 ```
+
+### Streamlit Web Interface (Recommended)
+
+The easiest way to use ArquimedesAI is through the web interface:
+
+```bash
+# Start the web interface
+streamlit run interfaces/streamlit/app.py
+```
+
+Then open your browser to `http://localhost:8501` for a beautiful chat interface with:
+
+- 💬 **Interactive Chat**: Clean, modern chat UI with conversation history
+- 🎯 **Visual Routing**: See which route was used (📚 Q&A, 🛠️ Generation, ✅ Validation, 💬 General)
+- 📊 **Confidence Scores**: Understand routing decisions with confidence percentages
+- ⚙️ **Sidebar Config**: Switch modes (grounded/concise/critic/explain) on the fly
+- 📄 **Source Display**: Optional view of retrieved document sources
+- 🔄 **Session Management**: Clear conversation and start fresh anytime
+- 🟢 **System Status**: Live indicators for Ollama and index status
+
+**No Discord setup required!** Perfect for testing and daily use.
 
 ### Discord Bot
 
@@ -376,6 +405,12 @@ python cli.py chat --mode explain
 ---
 
 ## 🎯 Features
+
+### User Interfaces
+
+- **Streamlit Web UI**: Beautiful chat interface with routing visualization and live config (recommended)
+- **CLI Chat**: Multi-mode interactive chat for testing and development
+- **Discord Bot**: Production deployment with async support and conversational memory
 
 ### Document Processing
 - **Docling HybridChunker**: Structure-aware, tokenization-optimized chunking

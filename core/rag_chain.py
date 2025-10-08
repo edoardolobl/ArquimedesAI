@@ -267,25 +267,26 @@ class RAGChain:
     
     def _create_routing_chain(self, style: str = "grounded"):
         """
-        Create dynamic routing chain using RunnableLambda (v2.0).
+        Create dynamic routing chain using RunnableLambda (v2.1.1 - with metadata).
         
         Returns a Runnable that routes queries to appropriate pre-built chains
-        based on semantic routing. The routing function SELECTS a chain
-        (doesn't rebuild), preserving conversational memory.
+        based on semantic routing, invokes them, and adds routing metadata to results.
         
         Args:
             style: Style for general queries (grounded/concise/critic/explain)
             
         Returns:
-            RunnableLambda that routes to appropriate chain
+            RunnableLambda that routes, invokes, and adds metadata
             
-        Pattern (from LangChain docs):
-            chain = RunnableLambda(lambda x: runnable1 if condition else runnable2)
+        Changes in v2.1.1:
+            - Now INVOKES the selected chain (not just returns it)
+            - Adds route + confidence metadata to result
+            - Fixes conversational mode routing display
         """
         from langchain_core.runnables import RunnableLambda
         
-        def route_and_select(input_dict):
-            """Route query and return appropriate pre-built chain."""
+        def route_and_invoke(input_dict):
+            """Route query, invoke chain, and add metadata."""
             query = input_dict["input"]
             
             # Route using semantic-router
@@ -298,16 +299,25 @@ class RAGChain:
             
             # Select appropriate pre-built chain
             if route_result.route == "gtm_qa":
-                return self.gtm_qa_chain
+                chain = self.gtm_qa_chain
             elif route_result.route == "gtm_generation":
-                return self.gtm_generation_chain
+                chain = self.gtm_generation_chain
             elif route_result.route == "gtm_validation":
-                return self.gtm_validation_chain
+                chain = self.gtm_validation_chain
             else:
                 # General chat - use style variant
-                return self.general_chains.get(style, self.general_chains["grounded"])
+                chain = self.general_chains.get(style, self.general_chains["grounded"])
+            
+            # Invoke selected chain
+            result = chain.invoke(input_dict)
+            
+            # Add routing metadata to result
+            result["route"] = route_result.route
+            result["confidence"] = route_result.confidence
+            
+            return result
         
-        return RunnableLambda(route_and_select)
+        return RunnableLambda(route_and_invoke)
     
     def get_session_history(self, session_id: str) -> InMemoryChatMessageHistory:
         """
@@ -393,19 +403,43 @@ class RAGChain:
             style: Style for general queries when routing enabled (default: grounded)
             
         Returns:
-            Dictionary with answer, context, and metadata
+            Dictionary with answer, context, route, and confidence metadata
         """
         logger.info(f"Query: {query}")
         
         input_data = {"input": query}
         
         if self.enable_routing:
-            # Use routing chain
-            routing_chain = self._create_routing_chain(style=style)
-            result = await routing_chain.ainvoke(input_data)
+            # Explicitly route to capture metadata
+            route_result = self.router.route(query)
+            
+            logger.info(
+                f"Routed to '{route_result.route}' "
+                f"(confidence: {route_result.confidence:.2f})"
+            )
+            
+            # Select appropriate chain based on route
+            if route_result.route == "gtm_qa":
+                chain = self.gtm_qa_chain
+            elif route_result.route == "gtm_generation":
+                chain = self.gtm_generation_chain
+            elif route_result.route == "gtm_validation":
+                chain = self.gtm_validation_chain
+            else:
+                # General chat - use style variant
+                chain = self.general_chains.get(style, self.general_chains["grounded"])
+            
+            # Invoke selected chain
+            result = await chain.ainvoke(input_data)
+            
+            # Add routing metadata to result
+            result["route"] = route_result.route
+            result["confidence"] = route_result.confidence
         else:
             # Use default chain (backward compat)
             result = await self.retrieval_chain.ainvoke(input_data)
+            result["route"] = "general_chat"
+            result["confidence"] = 1.0
         
         logger.info("✓ Query processed")
         return result
@@ -419,19 +453,43 @@ class RAGChain:
             style: Style for general queries when routing enabled (default: grounded)
             
         Returns:
-            Dictionary with answer, context, and metadata
+            Dictionary with answer, context, route, and confidence metadata
         """
         logger.info(f"Query: {query}")
         
         input_data = {"input": query}
         
         if self.enable_routing:
-            # Use routing chain
-            routing_chain = self._create_routing_chain(style=style)
-            result = routing_chain.invoke(input_data)
+            # Explicitly route to capture metadata
+            route_result = self.router.route(query)
+            
+            logger.info(
+                f"Routed to '{route_result.route}' "
+                f"(confidence: {route_result.confidence:.2f})"
+            )
+            
+            # Select appropriate chain based on route
+            if route_result.route == "gtm_qa":
+                chain = self.gtm_qa_chain
+            elif route_result.route == "gtm_generation":
+                chain = self.gtm_generation_chain
+            elif route_result.route == "gtm_validation":
+                chain = self.gtm_validation_chain
+            else:
+                # General chat - use style variant
+                chain = self.general_chains.get(style, self.general_chains["grounded"])
+            
+            # Invoke selected chain
+            result = chain.invoke(input_data)
+            
+            # Add routing metadata to result
+            result["route"] = route_result.route
+            result["confidence"] = route_result.confidence
         else:
             # Use default chain (backward compat)
             result = self.retrieval_chain.invoke(input_data)
+            result["route"] = "general_chat"
+            result["confidence"] = 1.0
         
         logger.info("✓ Query processed")
         return result
