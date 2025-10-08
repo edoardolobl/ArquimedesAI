@@ -57,6 +57,13 @@ PHASE1_v1.4_IMPLEMENTATION.md
 GEMMA3_DOCUMENTATION_UPDATE.md
 DEPRECATION_FIXES_v1.3.1.md
 
+# Bug Fix Documentation (Development Artifacts)
+BUGFIX_*.md
+*_FIXES_*.md
+*_ENHANCEMENTS_*.md
+*_SUMMARY.md
+*_GUIDE.md
+
 # Implementation & Integration Documents (Development Artifacts)
 *_IMPLEMENTATION_*.md
 *_INTEGRATION_*.md
